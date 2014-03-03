@@ -49,7 +49,7 @@ Most browser's default video control set contain the following controls:
 
 The custom control set will also support this functionality, with the addition of a stop button.
 
-Once again the HTML is quite straight forward, using an unordered list to enclose the controls each of which is a list item. For the progress bar, the ``progress`` element is taken advantage of, with a fallback provided for browsers that don't support it (e.g. IE8 and IE9). This list is inserted after the ``video`` element, but inside the ``figure`` element (this is important for the fullscreen functionality, which is explained later on).
+Once again the HTML is quite straight forward, using an unordered list with ``list-style-type:none`` to enclose the controls each of which is a list item with ``float:left``. For the progress bar, the ``progress`` element is taken advantage of, with a fallback provided for browsers that don't support it (e.g. IE8 and IE9). This list is inserted after the ``video`` element, but inside the ``figure`` element (this is important for the fullscreen functionality, which is explained later on).
 
 ```html
 <ul id="video-controls" class="controls">
@@ -91,3 +91,95 @@ if (supportsVideo) {
 }
 ```
 
+Once it has been confirmed that the browser does indeed support HTML5 video, it's time to set up the custom controls. A number of handles to HTML elements are required:
+
+```javascript
+var videoContainer = document.getElementById('videoContainer');
+var video = document.getElementById('video');
+var videoControls = document.getElementById('video-controls');
+```
+
+As mentioned earlier, the browser's default controls now need to be disabled, and the custom controls need to be displayed:
+
+```javascript
+// Hide the default controls
+video.controls = false;
+
+// Display the user defined video controls
+videoControls.style.display = 'block';
+```
+
+With that done, a handle to each of the buttons is now required:
+
+```javascript
+var playpause = document.getElementById('playpause');
+var stop = document.getElementById('stop');
+var mute = document.getElementById('mute');
+var volinc = document.getElementById('volinc');
+var voldec = document.getElementById('voldec');
+var progress = document.getElementById('progress');
+var progressBar = document.getElementById('progress-bar');
+var fullscreen = document.getElementById('fs');
+```
+
+Using these handles, events can now be attached to each of the custom control buttons making them interactive. Most of these buttons require a simple ``click`` event listener to be added, and a Media API defined method and/or attributes to be called/checked on the video.
+
+###Play/Pause
+
+```javascript
+playpause.addEventListener('click', function(e) {
+   if (video.paused || video.ended) video.play();
+   else video.pause();
+});
+```
+
+When a ``click`` event is detected on the play/pause button, the handler first of all checks if the video is currently paused or has ended (via the Media API's ``paused`` and ``ended`` attributes), and if so, it uses the ``play()`` method to playback the video. Otherwise the video must be playing, so it is paused using the ``pause()`` method.
+
+###Stop
+
+```javascript
+stop.addEventListener('click', function(e) {
+   video.pause();
+   video.currentTime = 0;
+   progress.value = 0;
+});
+```
+
+The Media API doesn't have a 'stop' method, so to mimic this, the video is paused, it's ``currentTime`` (i.e. the video's current playing position) is reset and so is the progress element's position (more on that later).
+
+###Mute
+
+```javascript
+mute.addEventListener('click', function(e) {
+   video.muted = !video.muted;
+});
+```
+
+The mute button is a simple toggle button which uses the Media API's ``muted`` attribute which is a Boolean indicating whether the video is muted or not.
+
+###Volume
+
+```javascript
+volinc.addEventListener('click', function(e) {
+   alterVolume('+');
+});
+voldec.addEventListener('click', function(e) {
+   alterVolume('-');
+});
+```
+
+Two volume control buttons have been defined, one for increasing the volume and another for decreasing it. A user defined function, ``alterVolume(direction)`` has been created which deals with this:
+
+```javascript
+var alterVolume = function(dir) {
+   var currentVolume = Math.floor(video.volume * 10) / 10;
+   if (dir === '+') {
+      if (currentVolume < 1) video.volume += 0.1;
+   }
+   else if (dir === '-') {
+      if (currentVolume > 0) video.volume -= 0.1;
+   }
+}
+```
+
+This function makes use of the Media API's ``volume`` attribute which holds the current volume value of the video. Valid values for this attribute are 0 and 1 and anything in between. The function checks the ``dir`` parameter which indicates whether the volume is to be increased (+) or decreased (-) and acts accordingly. The function is defined to increase or decrease the video's ``volume`` attribute in steps of 0.1, ensuring that it doesn't go lower than 0 or higher than 1.
