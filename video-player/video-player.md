@@ -45,6 +45,7 @@ Most browser's default video control set contain the following controls:
 * mute
 * volume control
 * progress bar
+* skip ahead
 * go fullscreen
 
 The custom control set will also support this functionality, with the addition of a stop button.
@@ -183,3 +184,65 @@ var alterVolume = function(dir) {
 ```
 
 This function makes use of the Media API's ``volume`` attribute which holds the current volume value of the video. Valid values for this attribute are 0 and 1 and anything in between. The function checks the ``dir`` parameter which indicates whether the volume is to be increased (+) or decreased (-) and acts accordingly. The function is defined to increase or decrease the video's ``volume`` attribute in steps of 0.1, ensuring that it doesn't go lower than 0 or higher than 1.
+
+###Progress
+
+When the ``progress`` element was defined above in the HTML, only two attributes were set, ``value`` and ``min``, both of which were set to 0. The function of these attributes are self-explanatory, with ``min`` indicating the minimum allowed value of the ``progress`` element and ``value`` indicating its current value. It also need to have a maximum value set so that it can display its range correctly, and this can be done via the ``max`` attribute which needs to be set to the maximum playing time of the video. This is obtained from the video's ``duration`` attribute which again is part of the Media API.
+
+Ideally, the correct value of the video's ``duration`` attribute is available when the ``loadedmetadata`` event is raised, which occurs when the video's metadata has been loaded:
+
+```javascript
+video.addEventListener('loadedmetadata', function() {
+   progress.setAttribute('max', video.duration);
+});
+```
+
+Unfortunately in mobile browsers, when ``loadedmetadata`` is raised, if it even *is* raised, ``video.duration`` may not have the correct value, or even any value at all. So something else needs to be done. More on that in a bit.
+
+Another event, ``timeupdate``, is raised periodically as the video is being played through. This event is ideal for updating the progress bar's value, setting it to the value of the video's ``currentTime`` attribute, which indicates how far through the video the current playback is.
+
+```javascript
+video.addEventListener('timeupdate', function() {
+   progress.value = video.currentTime;
+   progressBar.style.width = Math.floor((video.currentTime / video.duration) * 100) + '%';
+});
+```
+As the ``timeupdate`` event is raised, the ``progress`` element's ``value`` attribute is set to the video's ``currentTime``. The ``span`` element mentioned earlier, for browsers that do not support the ``progress`` element (e.g. Internet Explorer 9), is also updated at this time, setting its width to be a percentage of the total time played. This ``span`` has a solid CSS background colour which helps it to visually act as a ``progress`` element.
+
+Coming back to the ``video.duration`` problem mentioned above, when the ``timeupdate`` event is raised, the video's ``duration`` attribute is set correctly in most mobile browsers. This can be taken advantage of to set the ``progress`` element's ``max`` attribute if it is currently not set:
+
+```javascript
+video.addEventListener('timeupdate', function() {
+   if (!progress.getAttribute('max')) progress.setAttribute('max', video.duration);
+   progress.value = video.currentTime;
+   progressBar.style.width = Math.floor((video.currentTime / video.duration) * 100) + '%';
+});
+```
+
+###Skip Ahead
+
+Another feature of most browser's video default control set is the ability to click on the video's progress bar to "skip ahead" to a different point in the video. This can also be achieved by adding a simple event listener to the ``progress`` element:
+
+```javascript
+progress.addEventListener('click', function(e) {
+   var pos = (e.pageX  - this.offsetLeft) / this.offsetWidth;
+   video.currentTime = pos * video.duration;
+});
+```
+
+This piece of code simply uses the clicked position to (roughly) work out where in the ``progress`` element the user has clicked, and to move the video to that position by setting the its ``currentTime`` attribute.
+
+###Fullscreen
+
+###Browser Compatibility
+
+The code accompanying this article is supported by the follow browsers (with caveats mentioned):
+
+| Desktop Browser   | Version | Caveat  |
+| ----------------- | ------- | ------- |
+| Chrome            | 4+      | |
+| Firefox           | 3.5+    | |
+| Internet Explorer | 9+      | |
+| Opera             | 10.5+   | |
+| Safari            | 4+      | |
+| Internet Explorer | 8       | Flash fallback
