@@ -234,15 +234,36 @@ This piece of code simply uses the clicked position to (roughly) work out where 
 
 ###Fullscreen
 
+The Fullscreen API should be straight forward to use: the user clicks a button, if the video is in fullscreen mode: cancel it, otherwise enter fullscreen mode.
+
+Alas it has been implemented in browsers in a number of weird and wonderful ways which requires a lot of extra code to check for various prefixed versions of attributes and methods so as to call the right one!
+
+To detect if a browser actually supports the Fullscreen API and that it is enabled, the following may be called:
+
+```javascript
+var fullScreenEnabled = !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
+```
+
+This simply tests all the different prefixed (and of course the non-prefixed!) Booleans to see if fullscreen is possible. The final tested value, ``document.createElement('video').webkitRequestFullScreen`` is required for the last Presto version of Opera (12.14). Note the different letter casing in the various values!
+
+
 ###Browser Compatibility
 
 The code accompanying this article is supported by the follow browsers (with caveats mentioned):
 
 | Desktop Browser   | Version | Caveat  |
 | ----------------- | ------- | ------- |
-| Chrome            | 4+      | |
-| Firefox           | 3.5+    | |
+| Firefox           | latest  | |
+| Chrome            | latest  | |
+| Safari            | 5.1     | |
 | Internet Explorer | 9+      | |
-| Opera             | 10.5+   | |
-| Safari            | 4+      | |
+| Opera (Blink)     | latest  | |
+| Opera (Presto)    | 12.14+  | |
 | Internet Explorer | 8       | Flash fallback
+
+| Mobile  Browser   | Version | Caveat  |
+| ----------------- | ------- | ------- |
+| Android default   | 4.3     | No fullscreen |
+| Android Firefox   | 27.0    | |
+| Android Chrome    | 33.0    | Default controls on fullscreen |
+| iOS               | 6.0     | Video plays in fullscreen only, default controls ignored on iPhone | 
