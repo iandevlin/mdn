@@ -246,10 +246,85 @@ var fullScreenEnabled = !!(document.fullscreenEnabled || document.mozFullScreenE
 
 This simply tests all the different prefixed (and of course the non-prefixed!) Booleans to see if fullscreen is possible. The final tested value, ``document.createElement('video').webkitRequestFullScreen`` is required for the last Presto version of Opera (12.14). Note the different letter casing in the various values!
 
+The visibility of the fullscreen button depends on whether the browser supports the Fullscreen API and that it is enabled.
+
+```javascript
+if (!fullScreenEnabled) {
+   fullscreen.style.display = 'none';
+}
+```
+
+Naturally the fullscreen button needs to actually do something, so, like the other buttons, a ``click`` event handler is attached in which we call a user defined function ``handleFullscreen``:
+
+```javascript
+fs.addEventListener('click', function(e) {
+   handleFullscreen();
+});
+```
+
+The ``handleFullscreen`` function is defined as follows:
+
+```javascript
+var handleFullscreen = function() {
+   if (isFullScreen()) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+      setFullscreenData(false);
+   }
+   else {
+      if (videoContainer.requestFullscreen) videoContainer.requestFullscreen();
+      else if (videoContainer.mozRequestFullScreen) videoContainer.mozRequestFullScreen();
+      else if (videoContainer.webkitRequestFullScreen) video.webkitRequestFullScreen();
+      else if (videoContainer.msRequestFullscreen) videoContainer.msRequestFullscreen();
+      setFullscreenData(true);
+   }
+}
+```
+
+First of all the function checks if the browser is already in fullscreen mode by calling another function ``isFullScreen``:
+
+```javascript
+var isFullScreen = function() {
+   return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
+}
+```
+
+This function checks all the various browser prefxed versions to try and determing the correct result.
+
+If the browser is currently in fullscreen mode, then it must be exited and vice versa. Support for the different prefixed versions of the relevant action are checked in order to call the correct one. Interestingly ``document`` must be used for exiting/cancelling fullscreen mode, whereas any HTML element can request fullscreen mode, here the ``videoContainer`` as it also contains the custom controls which will also appear with the video in fullscreen mode.
+
+The exception to this is Safari 5.1 which will only allow ``webkitRequestFullScreen`` to be called on the ``video`` element. The custom controls will only appear on this browser in fullscreen mode with some WebKit specific CSS, first of all forcing the default browser controls to be hidden with ``video::-webkit-media-controls { display:none !important; }`` and secondly the custom controls container needs to have a special ``z-index`` value: ``.controls { z-index:2147483647; }``. Dealing with WebKit specific code in this way will affect all WebKit browsers, but everything works as expected in more advanced WebKit browsers such as Chrome and the latest Opera.
+
+Another user defined function ``setFullscreenData()`` is also called which simply sets the value of a [``data-fullscreen``](http://toddmotto.com/stop-toggling-classes-with-js-use-behaviour-driven-dom-manipulation-with-data-states/) attribute on the ``videoContainer``.
+
+```javascript
+var setFullscreenData = function(state) {
+   videoContainer.setAttribute('data-fullscreen', !!state);
+}
+```
+
+ This is used simply to set some basic CSS to improve the styling of the custom controls when they are in fullscreen (see the sample code for further details). When a video goes into fullscreen mode, it usually displays a message indicating that the user can press the _Esc_ key to exit fullscreen mode, so the code also needs to listen for relevant events in order to call the ``setFullscreenData`` function to ensure the control styling is correct:
+
+ ```javascript
+document.addEventListener('fullscreenchange', function(e) {
+   setFullscreenData(!!(document.fullScreen || document.fullscreenElement));
+});
+document.addEventListener('webkitfullscreenchange', function() {
+   setFullscreenData(!!document.webkitIsFullScreen);
+});
+document.addEventListener('mozfullscreenchange', function() {
+   setFullscreenData(!!document.mozFullScreen);
+});
+document.addEventListener('msfullscreenchange', function() {
+   setFullscreenData(!!document.msFullscreenElement);
+});
+```
 
 ###Browser Compatibility
 
-The code accompanying this article is supported by the follow browsers (with caveats mentioned):
+The code accompanying this article is supported by the following browsers (with caveats mentioned):
 
 | Desktop Browser   | Version | Caveat  |
 | ----------------- | ------- | ------- |
@@ -263,7 +338,14 @@ The code accompanying this article is supported by the follow browsers (with cav
 
 | Mobile  Browser   | Version | Caveat  |
 | ----------------- | ------- | ------- |
-| Android default   | 4.3     | No fullscreen |
+| Android default   | 4.0+    | No fullscreen |
 | Android Firefox   | 27.0    | |
 | Android Chrome    | 33.0    | Default controls on fullscreen |
-| iOS               | 6.0     | Video plays in fullscreen only, default controls ignored on iPhone | 
+| iOS               | 5.0+    | iPhone - Video plays in fullscreen only, default controls ignored, default controls are enforced |
+|                   |         | [Changing of volume and mute via JavaScript not supported](https://developer.apple.com/library/safari/documentation/audiovideo/conceptual/using_html5_audio_video/device-specificconsiderations/device-specificconsiderations.html) |
+
+Sadly iOS has poor support for custom controls, so it might be best to allow the default controls to do their thing.
+
+###Example Code
+
+The example code for the player accompanying this article is not very well styled, as will be apparent! How to style this player, where appropriate, will be visited in a future article.
