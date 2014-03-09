@@ -6,7 +6,7 @@ This article describes a simple HTML5 video player that uses the Media and Fulls
 
 To start off with, let's take a look at the HTML that makes up the player.
 
-First of all the ``video`` element is defined, contained within a ``figure`` element which acts as the video container. To anyone familiar with HTML5 markup and the video element, there should be nothing here that surprises you.
+First of all the ``video`` element is defined, contained within a ``figure`` element which acts as the video container. To anyone familiar with HTML5 markup and the ``video`` element, there should be nothing here that surprises you.
 
 ```html
 <figure id="videoContainer">
@@ -32,6 +32,8 @@ Even though this player will define its own custom control set, the ``controls``
 
 A poster image is defined for the video, and the ``preload`` is set to ``metadata`` which informs the browser that it should only attempt to load the metadata off the video file rather than the entire video file. This provides the player with data such as video duration.
 
+~~A small note on browser behaviour and the ``poster`` attribute. When a poster image is defined most browsers will take this to mean that the specified image is to be displayed until the user chooses to play the video. The exception to this are Internet Explorer 9 and 10 (IE11 does it correctly) which will only use the specified poster image in this way if ``preload=none`` as otherwise it will take the first still of the video and display that instead.~~(this used to be the case, need to double check)
+
 Three different video sources are provided for the player: MP4, WebM, and Ogg. Using these different source formats gives the best chance of being supported across all browsers that support HTML5 video. For further information on video formats and browser compatibility, see [supported media formats](https://developer.mozilla.org/en-US/docs/HTML/Supported_media_formats#Browser_compatibility).
 
 For browsers that do not support HTML5 video, a Flash player is provided that will allow playback of the MP4 video source, provided the end user has Flash installed. In addition a download link is displayed which allows users to download the MP4 video file, should they wish to (and providing those without Flash installed with a method of viewing the video, a fallback for a fallback if you like). 
@@ -40,7 +42,7 @@ The code above would allow playback of the video in most browsers, using the bro
 
 ##Control Set
 
-Most browser's default video control set contain the following controls:
+Most browser's default video control set has the following functionality:
 * play/pause
 * mute
 * volume control
@@ -68,9 +70,9 @@ Once again the HTML is quite straight forward, using an unordered list with ``li
 </ul>
 ```
 
-Each button is given an id so it can be easily accessed with JavaScript. The ``span`` within the ``progress`` is for [browsers that do not support the ``progress`` element](http://caniuse.com/#search=progress) and will be updated at the same time as ``progress`` is (this ``span`` element won't be visible on browsers that support ``progress``).
+Each button is given an ``id`` so it can be easily accessed with JavaScript. The ``span`` within the ``progress`` is for [browsers that do not support the ``progress`` element](http://caniuse.com/#search=progress) and will be updated at the same time as ``progress`` (this ``span`` element won't be visible on browsers that support ``progress``).
 
-The controls are initially hidden with a CSS ``display:none`` and will be enabled with JavaScript. Again if a user has JavaScript disabled, the custom control set will never appear and they can use the browser's default control set.
+The controls are initially hidden with a CSS ``display:none`` and will be enabled with JavaScript. Again if a user has JavaScript disabled, the custom control set will not appear and they can use the browser's default control set unhindered.
 
 Of course this custom control set is currently useless and doesn't do a thing, and this can only be chaned with JavaScript.
 
@@ -146,7 +148,7 @@ stop.addEventListener('click', function(e) {
 });
 ```
 
-The Media API doesn't have a 'stop' method, so to mimic this, the video is paused, it's ``currentTime`` (i.e. the video's current playing position) is reset and so is the progress element's position (more on that later).
+The Media API doesn't have a 'stop' method, so to mimic this, the video is paused, its ``currentTime`` (i.e. the video's current playing position) is reset and so is the progress element's position (more on that later).
 
 ###Mute
 
@@ -197,7 +199,7 @@ video.addEventListener('loadedmetadata', function() {
 });
 ```
 
-Unfortunately in mobile browsers, when ``loadedmetadata`` is raised, if it even *is* raised, ``video.duration`` may not have the correct value, or even any value at all. So something else needs to be done. More on that in a bit.
+Unfortunately in some mobile browsers, when ``loadedmetadata`` is raised, if it even *is* raised, ``video.duration`` may not have the correct value, or even any value at all. So something else needs to be done. More on that in a bit.
 
 Another event, ``timeupdate``, is raised periodically as the video is being played through. This event is ideal for updating the progress bar's value, setting it to the value of the video's ``currentTime`` attribute, which indicates how far through the video the current playback is.
 
@@ -221,7 +223,7 @@ video.addEventListener('timeupdate', function() {
 
 ###Skip Ahead
 
-Another feature of most browser's video default control set is the ability to click on the video's progress bar to "skip ahead" to a different point in the video. This can also be achieved by adding a simple event listener to the ``progress`` element:
+Another feature of most browser's video default control set is the ability to click on the video's progress bar to "skip ahead" to a different point in the video. This can also be achieved by adding a simple ``click`` event listener to the ``progress`` element:
 
 ```javascript
 progress.addEventListener('click', function(e) {
@@ -230,13 +232,13 @@ progress.addEventListener('click', function(e) {
 });
 ```
 
-This piece of code simply uses the clicked position to (roughly) work out where in the ``progress`` element the user has clicked, and to move the video to that position by setting the its ``currentTime`` attribute.
+This piece of code simply uses the clicked position to (roughly) work out where in the ``progress`` element the user has clicked, and to move the video to that position by setting its ``currentTime`` attribute.
 
 ###Fullscreen
 
 The Fullscreen API should be straight forward to use: the user clicks a button, if the video is in fullscreen mode: cancel it, otherwise enter fullscreen mode.
 
-Alas it has been implemented in browsers in a number of weird and wonderful ways which requires a lot of extra code to check for various prefixed versions of attributes and methods so as to call the right one!
+Alas it has been implemented in browsers in a number of weird and wonderful ways which requires a lot of extra code to check for various prefixed versions of attributes and methods so as to call the right one.
 
 To detect if a browser actually supports the Fullscreen API and that it is enabled, the following may be called:
 
@@ -244,7 +246,7 @@ To detect if a browser actually supports the Fullscreen API and that it is enabl
 var fullScreenEnabled = !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
 ```
 
-This simply tests all the different prefixed (and of course the non-prefixed!) Booleans to see if fullscreen is possible. The final tested value, ``document.createElement('video').webkitRequestFullScreen`` is required for the last Presto version of Opera (12.14). Note the different letter casing in the various values!
+This simply tests all the different prefixed (and of course the non-prefixed!) Booleans to see if fullscreen is possible. The final tested value, ``document.createElement('video').webkitRequestFullScreen`` is required for the last Presto version of Opera (12.14). Note the different letter casing in the various values.
 
 The visibility of the fullscreen button depends on whether the browser supports the Fullscreen API and that it is enabled.
 
@@ -293,11 +295,11 @@ var isFullScreen = function() {
 
 This function checks all the various browser prefxed versions to try and determing the correct result.
 
-If the browser is currently in fullscreen mode, then it must be exited and vice versa. Support for the different prefixed versions of the relevant action are checked in order to call the correct one. Interestingly ``document`` must be used for exiting/cancelling fullscreen mode, whereas any HTML element can request fullscreen mode, here the ``videoContainer`` as it also contains the custom controls which will also appear with the video in fullscreen mode.
+If the browser is currently in fullscreen mode, then it must be exited and vice versa. Support for the different prefixed versions of the relevant action are checked in order to call the correct one. Interestingly ``document`` must be used for exiting/cancelling fullscreen mode, whereas any HTML element can request fullscreen mode, here the ``videoContainer`` is used as it also contains the custom controls which should also appear with the video in fullscreen mode.
 
 The exception to this is Safari 5.1 which will only allow ``webkitRequestFullScreen`` to be called on the ``video`` element. The custom controls will only appear on this browser in fullscreen mode with some WebKit specific CSS, first of all forcing the default browser controls to be hidden with ``video::-webkit-media-controls { display:none !important; }`` and secondly the custom controls container needs to have a special ``z-index`` value: ``.controls { z-index:2147483647; }``. Dealing with WebKit specific code in this way will affect all WebKit browsers, but everything works as expected in more advanced WebKit browsers such as Chrome and the latest Opera.
 
-Another user defined function ``setFullscreenData()`` is also called which simply sets the value of a [``data-fullscreen``](http://toddmotto.com/stop-toggling-classes-with-js-use-behaviour-driven-dom-manipulation-with-data-states/) attribute on the ``videoContainer``.
+Another user defined function ``setFullscreenData()`` is also called which simply sets the value of a ``data-fullscreen`` attribute on the ``videoContainer`` (this makes use of [``data-states``](http://toddmotto.com/stop-toggling-classes-with-js-use-behaviour-driven-dom-manipulation-with-data-states/)).
 
 ```javascript
 var setFullscreenData = function(state) {
@@ -348,4 +350,4 @@ Sadly iOS has poor support for custom controls, so it might be best to allow the
 
 ###Example Code
 
-The example code for the player accompanying this article is not very well styled, as will be apparent! How to style this player, where appropriate, will be visited in a future article.
+As mentioned at the very beginning of this article, the accompanying example code for the player is not very well styled beyond the basics, as will be apparent! How to style this player, where appropriate, will be visited in a future article.
