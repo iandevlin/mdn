@@ -1,0 +1,3 @@
+#Video Player with Captions
+
+Previously we looked at how to [build a cross browser video player](https://developer.mozilla.org/en-US/Apps/Build/Manipulating_media/cross_browser_video_player) using the Media and Fullscreen APIs, and also at how to [style the player](https://developer.mozilla.org/en-US/Apps/Build/Manipulating_media/Video_player_styling_basics). This article will take the same player and look at how subtitles or captions could be added.
