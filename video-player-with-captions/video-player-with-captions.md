@@ -215,7 +215,7 @@ That's pretty much all that's required to get the captions working on most brows
 
 ##Browser Compatibility
 
-Browser support for WebVTT captions and the `<track>` element is fairly good, although some browsers differ slightly in their implementation.
+Browser support for [WebVTT and the `<track>` element](http://caniuse.com/webvtt) is fairly good, although some browsers differ slightly in their implementation.
 
 ###Internet Explorer 11
 Captions are enabled by default, and the default controls contains a button and a menu that offers the same functionality as the menu we just built. The `default` attribute is honoured.
