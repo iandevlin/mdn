@@ -70,7 +70,25 @@ In addition to adding the `<track>` elements, we also add a new button to contro
 
 ###CSS Changes
 
-The video controls undergo some minor changes in order to facilitate the extra button, but these are relatively straightforward. There will also be other CSS changes that are specific to some extra JavaScript implementation, but these will be mentioned at the appropriate place below.
+The video controls undergo some minor changes in order to facilitate the extra button, but these are relatively straightforward.
+
+No image is used for the captions button, so it is simply styled as:
+```css
+.controls button[data-state="captions"] {
+	height:85%;
+	text-indent:0;
+	font-size:16px;
+	font-size:1rem;
+	font-weight:bold;
+	color:#666;
+	background:#000;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	border-radius:2px;
+}
+```
+
+There will also be other CSS changes that are specific to some extra JavaScript implementation, but these will be mentioned at the appropriate place below.
 
 ##JavaScript Implementation
 
@@ -88,5 +106,107 @@ for (var i = 0; i < video.textTracks.length; i++) {
    video.textTracks[i].mode = 'hidden';
 }
 ```
-As you can see, we loop through each `textTrack` within the video and set its `mode` to `'hidden'`. Wait, `textTrack`? `mode`? Similar to the Media API, there is also a (WebVTT API)[http://dev.w3.org/html5/webvtt/#api] which gives us access to all the text tracks that are defined for a HTML5 video using the `<track>` element.
+As you can see, we loop through each `textTracks` within the video and set its `mode` to `'hidden'`. We can does this via a handy API, which, similar to the Media API, the [WebVTT API](http://dev.w3.org/html5/webvtt/#api) gives us access to all the text tracks that are defined for a HTML5 video using the `<track>` element.
 
+###Building a caption menu
+
+Our aim, is to use the captions button we added earlier to display a menu to the user that allows them to choose which language they want the captions displayed in, or to turn them off entirely.
+
+We have added the button, but before we make it do anything, we need to build the menu that goes with it. This menu is built dynamically, so that languages can be added or removed to/from it by simply editing the `<track>` elements within the video's markup.
+
+All we need to do is to go through the video's `textTracks`, reading its properties and building the menu up from there:
+```javascript
+var captionsMenu;
+if (video.textTracks) {
+   var df = document.createDocumentFragment();
+   var captionsMenu = df.appendChild(document.createElement('ul'));
+   captionsMenu.className = 'captions-menu';
+   captionsMenu.appendChild(createMenuItem('captions-off', '', 'Off'));
+   for (var i = 0; i < video.textTracks.length; i++) {
+      captionsMenu.appendChild(createMenuItem('captions-' + video.textTracks[i].language, video.textTracks[i].language,         video.textTracks[i].label));
+   }
+   videoContainer.appendChild(captionsMenu);
+}
+```
+This code creates a `documentFragment` which is then used to hold an unordered list containing our captions menu. First of all button is added to allow the user to switch all captions off, and then buttons are added for each `textTracks`, reading the language and label from each one.
+
+The building of each list item and button is contained within the `createMenuItem()` function which is defined as follows:
+```javascript
+var captionMenuButtons = [];
+var createMenuItem = function(id, lang, label) {
+   var listItem = document.createElement('li');
+   var button = listItem.appendChild(document.createElement('button'));
+   button.setAttribute('id', id);
+   button.className = 'captions-button';
+   if (lang.length > 0) button.setAttribute('lang', lang);
+   button.value = label;
+   button.setAttribute('data-state', 'inactive');
+   button.appendChild(document.createTextNode(label));
+   button.addEventListener('click', function(e) {
+      // Set all buttons to inactive
+      captionMenuButtons.map(function(v, i, a) {
+         captionMenuButtons[i].setAttribute('data-state', 'inactive');
+      });
+      // Find the language to activate
+      var lang = this.getAttribute('lang');
+      for (var i = 0; i < video.textTracks.length; i++) {
+         // For the 'captions-off' button, the first condition will never match so all will captions be turned off
+         if (video.textTracks[i].language == lang) {
+            video.textTracks[i].mode = 'showing';
+            this.setAttribute('data-state', 'active');
+         }
+         else {
+            video.textTracks[i].mode = 'hidden';
+         }
+      }
+      captionsMenu.style.display = 'none';
+   });
+   captionMenuButtons.push(button);
+   return listItem;
+}
+```
+This function builds the required `<li>` and `<button>` and returns them to be added to the captions menu list. It also sets up the required event listeners on the button which actually toggles the relevant caption set on or off. This is done by simply setting the required caption to `showing` via the `mode` attribute and setting the others to `hidden`.
+
+Once the menu is built, it is then inserted into the DOM at the bottom of the `videoContainer` (see code snippet above).
+
+Initially the menu is hidden by default, so an event listener needs to be added to our captions button to toggle it:
+```javascript
+captions.addEventListener('click', function(e) {
+   if (captionsMenu) {
+      captionsMenu.style.display = (captionsMenu.style.display == 'block' ? 'none' : 'block');
+   }
+});
+```
+
+###CSS
+
+Some rudimentary styling for the newly created captions menu is also required:
+```css
+captions-menu {
+	display:none;
+	position:absolute;
+	bottom:14.8%;
+	right:20px;
+	background:#666;
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	width:100px;
+	padding:10px;
+}
+.captions-menu li {
+	padding:0;
+	text-align:center;
+}
+.captions-menu li button {
+	border:none;
+	background:#000;
+	color:#fff;
+	cursor:pointer;
+	width:90%;
+	padding:2px 5px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	border-radius:2px;
+}
+```
