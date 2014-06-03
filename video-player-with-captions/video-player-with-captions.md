@@ -2,6 +2,12 @@
 
 Previously we looked at how to [build a cross browser video player](https://developer.mozilla.org/en-US/Apps/Build/Manipulating_media/cross_browser_video_player) using the Media and Fullscreen APIs, and also at how to [style the player](https://developer.mozilla.org/en-US/Apps/Build/Manipulating_media/Video_player_styling_basics). This article will take the same player and look at how captions and/or subtitles could be added.
 
+##The example in action
+
+ENTER SCREENSHOT HERE
+
+You can find the code for the [video player with captions](https://github.com/iandevlin/iandevlin.github.io/tree/master/mdn/video-player-with-captions) on GitHub, and you can also [view it live](http://iandevlin.github.io/mdn/video-player-with-captions/).
+
 ##HTML5 and Video Captions
 
 Before diving into how to add captions to the video player, there are a number of things that need to be cleared up and mentioned before use.
@@ -20,7 +26,7 @@ Video providers (such as the [Blender Foundation](http://www.blender.org/foundat
 
 This section summarises the modifications made to the previous article's code in order to facilitate the addition of subtitles to the video.
 
-In this example we are using a different video to the one used in the previous articles as it actually has some speech in it and therefore is better for illustrating how captions work!
+In this example we are using a different video, [Sintel](http://www.sintel.org/), to the one used in the previous articles as it actually has some speech in it and therefore is better for illustrating how captions work!
 
 ###HTML Markup
 
