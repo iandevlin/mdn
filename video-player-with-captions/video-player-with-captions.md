@@ -72,3 +72,21 @@ In addition to adding the `<track>` elements, we also add a new button to contro
 
 The video controls undergo some minor changes in order to facilitate the extra button, but these are relatively straightforward. There will also be other CSS changes that are specific to some extra JavaScript implementation, but these will be mentioned at the appropriate place below.
 
+##JavaScript Implementation
+
+A lot of what we will do to access the video captions revolves around JavaScript. Similar to the video controls, if a browser supports HTML5 video captions, there will be a native button within the control set but since we have defined our own video control set, this button is hidden.
+
+Browsers do vary as to what they support, so we will be attempting to bring a more unified UI to each browser where possible. There's more on browser compatibility and issues later on.
+
+As with all the other buttons, one of the first things we need to do is to store a handle to the captions button:
+```javascript
+var captions = document.getElementById('captions');
+```
+We also initially turn off all captions, in case the browser turns any of them on by default:
+```javascript
+for (var i = 0; i < video.textTracks.length; i++) {
+   video.textTracks[i].mode = 'hidden';
+}
+```
+As you can see, we loop through each `textTrack` within the video and set its `mode` to `'hidden'`. Wait, `textTrack`? `mode`? Similar to the Media API, there is also a (WebVTT API)[http://dev.w3.org/html5/webvtt/#api] which gives us access to all the text tracks that are defined for a HTML5 video using the `<track>` element.
+
