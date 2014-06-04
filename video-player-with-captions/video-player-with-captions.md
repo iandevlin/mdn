@@ -38,7 +38,7 @@ As mentioned above, we need to make use of the new HTML5 `<track>` element to ad
    <source src="video/sintel-short.webm" type="video/webm">
    <track label="English" kind="captions" srclang="en" src="captions/vtt/sintel-en.vtt" default>
    <track label="Deutsch" kind="captions" srclang="de" src="captions/vtt/sintel-de.vtt">
-   <track label="Español" kind="captions" srclang="es" src="captions/vtt/sintel-es.vtt">
+   <track label="Espanol" kind="captions" srclang="es" src="captions/vtt/sintel-es.vtt">
 </video>
 ```
 
@@ -217,17 +217,17 @@ That's pretty much all that's required to get the captions working on most brows
 
 Browser support for [WebVTT and the `<track>` element](http://caniuse.com/webvtt) is fairly good, although some browsers differ slightly in their implementation.
 
-###Internet Explorer 11
-Captions are enabled by default, and the default controls contains a button and a menu that offers the same functionality as the menu we just built. The `default` attribute is honoured.
+###Internet Explorer
+Since Internet Explorer 10+ captions are enabled by default, and the default controls contains a button and a menu that offers the same functionality as the menu we just built. The `default` attribute is also honoured.
 
 NOTE: IE will completely ignore WebVTT files unless you setup the MIME type. This can easily be done by adding a `.htaccess` file to the appropriate directory that contains: `AddType text/vtt .vtt`.
 
-###Chrome and Opera
-Since they both run on WebKit, these browsers have similar implementations of video captions. Captions are enabled by default, and the default control set contains a 'cc' button which simply turns captions on and off. It ignores the `default` attribute on the `<track>` element and will try to match the browser's language to the caption's language.
-
 ###Safari
 
-TODO!
+Safari 6.1+ has similar support to Internet Explorer 11, displaying a menu with the different available options, with the addition of an "Auto" option which allows the browser to choose.
+
+###Chrome and Opera
+These browsers have similar implementations of video captions in that they are enabled by default and the default control set contains a 'cc' button which simply turns captions on and off. It ignores the `default` attribute on the `<track>` element and will try to match the browser's language to the caption's language.
 
 ###Firefox
 Firefox's implementation is completely broken due to a [bug](https://bugzilla.mozilla.org/show_bug.cgi?id=981280), and this has led Mozilla to take the decision to turn off WebVTT support by default but you can turn it on via the `media.webvtt.enabled` flag.
