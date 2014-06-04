@@ -211,6 +211,10 @@ captions-menu {
 }
 ```
 
+##Cue Styling
+
+
+
 That's pretty much all that's required to get the captions working on most browsers. Most.
 
 ##Browser Compatibility
