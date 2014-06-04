@@ -216,7 +216,7 @@ captions-menu {
 One of the less known about, and less supported, features of WebVTT, is the ability to style the individual captions via [CSS Extensions](http://dev.w3.org/html5/webvtt/#css-extensions). 
 
 The `::cue` pseudo-element is the key to targetting individual text track cues for styling, as it matches any defined cue. There are only a handful of CSS properties that will be supported by this:
-* `color
+* `color`
 * `opacity`
 * `visibility`
 * `text-decoration`
