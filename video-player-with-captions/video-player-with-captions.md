@@ -213,9 +213,39 @@ captions-menu {
 
 ##Cue Styling
 
+One of the less known about, and less supported, features of WebVTT, is the ability to style the individual captions via [CSS Extensions](http://dev.w3.org/html5/webvtt/#css-extensions). 
 
+The `::cue` pseudo-element is the key to targetting individual text track cues for styling, as it matches any defined cue. There are only a handful of CSS properties that will be supported by this:
+* `color
+* `opacity`
+* `visibility`
+* `text-decoration`
+* `text-shadow`
+* `background` shorthand properties
+* `outline` shorthand properties
+* `font` shorthand properties, including `line-height`
+* `white-space`
 
-That's pretty much all that's required to get the captions working on most browsers. Most.
+For example, to change the text colour of the text track cues you can write:
+```css
+::cue { 
+   color:#ccc;
+}
+```
+If the WebVTT file uses [voice spans](http://dev.w3.org/html5/webvtt/dfn-webvtt-cue-voice-span) which allow cues to be defined as having a particular "voice":
+```
+0
+00:00:00.000 --> 00:00:12.000
+<v Test>[Test]</v>
+```
+Then this specific 'voice' will be stylable as such:
+```css
+::cue(v[voice='Test']) {
+   color:#fff;
+   background:#0095dd;
+}
+```
+Some of the styling of cues with `::cue` currently works on Chrome, Opera, and Safari.
 
 ##Browser Compatibility
 
