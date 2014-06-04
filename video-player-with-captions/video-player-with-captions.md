@@ -38,7 +38,7 @@ As mentioned above, we need to make use of the new HTML5 `<track>` element to ad
    <source src="video/sintel-short.webm" type="video/webm">
    <track label="English" kind="captions" srclang="en" src="captions/vtt/sintel-en.vtt" default>
    <track label="Deutsch" kind="captions" srclang="de" src="captions/vtt/sintel-de.vtt">
-   <track label="Espanol" kind="captions" srclang="es" src="captions/vtt/sintel-es.vtt">
+   <track label="Español" kind="captions" srclang="es" src="captions/vtt/sintel-es.vtt">
 </video>
 ```
 
